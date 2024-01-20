@@ -28,11 +28,27 @@ function onSubmitForm(e) {
   const loadingIndicator = document.querySelector('.loading-indicator');
   loadingIndicator.style.display = 'block';
   const inputRef = document.querySelector('form input').value;
-  fetch(`${BASE_URL}?key=${API_KEY}&q=${inputRef}`)
-    .then(resp => resp.json())
+
+  // Додавання обов'язкових параметрів до URL-адреси запиту fetch
+  const mandatoryParams =
+    '&image_type=photo&orientation=horizontal&safesearch=true';
+  fetch(`${BASE_URL}?key=${API_KEY}&q=${inputRef}${mandatoryParams}`)
+    .then(resp => {
+      if (!resp.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return resp.json();
+    })
     .then(data => {
+      // Обробка успішного відгуку
       markupElements(data);
       loadingIndicator.style.display = 'none';
+    })
+    .catch(error => {
+      // Обробка помилок мережі або API
+      console.error('Fetch error:', error);
+      loadingIndicator.style.display = 'none';
+      // Додавання логіки для відображення помилки користувачу або іншої обробки помилок
     });
 }
 
